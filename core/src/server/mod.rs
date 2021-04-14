@@ -1,4 +1,4 @@
-pub(crate) mod run_protoc_server;
-mod gen_protobuf;
+mod server;
+mod protogen;
 
-pub use run_protoc_server::run_protoc_server;
+pub use self::server::run_protoc_server;

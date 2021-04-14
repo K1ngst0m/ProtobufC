@@ -5,12 +5,7 @@ use std::process::Command;
 
 #[test]
 fn file_output(){
-    let output = Command::new("echo")
-        .arg("hello world")
-        .output()
-        .expect("Failed to execute command");
 
-    assert_eq!(b"hello world\n", output.stdout.as_slice());
 }
 
 #[test]
