@@ -11,6 +11,7 @@ pub fn gen_protobuf(
     _arg: &Option<String>,
     proto_content: &String,
 ) -> String {
+    let server_ip = "127.0.0.1";
     // downloads root path
     let download_root_directory = "./static/downloads/protogen".to_string();
     // generation directory
@@ -24,7 +25,7 @@ pub fn gen_protobuf(
     let proto_path = format!("--proto_path={}", &gen_directory_path);
 
     // output type (language)
-    let cpp_output = match &language[..] {
+    let language_output = match &language[..] {
         "cpp" | "c++" => format!("--cpp_out={}", &gen_directory_path),
         "csharp" | "c#" => {
             output_name = first_letter_upper(&output_name.clone());
@@ -58,32 +59,33 @@ pub fn gen_protobuf(
     let pack_type = "zip";
 
     // compress file name
-    let pack_path = match &pack_type[..] {
+    // TODO: set compress type
+    let _pack_path = match &pack_type[..] {
         "zip" => format!("{}/{}.zip", &gen_directory_path, &output_name),
         "tar" => format!("{}/{}.tar.gz", &gen_directory_path, &output_name),
         _ => format!("{}/{}.zip", &gen_directory_path, &output_name),
     };
 
     // compress file list
-    let pack_files = match &language[..] {
-        "cpp" | "c++" => format!("{0}/{1}*.cc {0}/{1}*.h", &gen_directory_path, &output_name),
-        "csharp" | "c#" => format!("{}/{}.cs", &gen_directory_path, &output_name),
-        //"java" => format!("{}/{}", &work_directory),
-        _ => "".to_string(),
-    };
-    // let pack_files = format!("{}/*", &gen_directory_path);
+    let pack_files = format!("{}", &gen_directory_path);
 
     // compile and compress files
     let status = Command::new(gen_exec)
-        .args(&[proto_path, cpp_output, src_file, pack_path, pack_files])
+        .args(&[
+            proto_path,
+            language_output,
+            src_file,
+            output_name.clone(),
+            pack_files,
+        ])
         .status()
         .expect("proto gen error");
     println!("gen_output: {}", status);
 
     // 返回url
     String::from(format!(
-        "http://192.168.1.141:8000/downloads/{}/{}.zip",
-        &gen_id, &output_name
+        "http://{}:8000/downloads/{}/{}.zip",
+        server_ip, gen_id, output_name
     ))
 }
 
